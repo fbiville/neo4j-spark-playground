@@ -8,10 +8,9 @@ import scala.util.Using
 
 object Playground {
 
-  val adminPassword = "letmein!"
+  private val adminPassword = "letmein!"
 
   def main(args: Array[String]): Unit = {
-
     Using(startContainer("5.6.0-enterprise")) {
       container => {
 
