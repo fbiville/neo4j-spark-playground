@@ -11,7 +11,7 @@ object Playground {
   private val adminPassword = "letmein!"
 
   def main(args: Array[String]): Unit = {
-    Using(startContainer("5.6.0-enterprise")) {
+    Using(startContainer("5.7.0-enterprise")) {
       container => {
 
         val spark = SparkSession.builder()
