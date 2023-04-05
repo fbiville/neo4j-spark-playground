@@ -33,8 +33,8 @@ object Playground {
     import spark.implicits._
 
     val df = List(
-      Tuple2("John Doe", 32),
-      Tuple2("Jane Doe", 42),
+      ("John Doe", 32),
+      ("Jane Doe", 42),
     ).toDF("name", "age")
 
     df.write.format("org.neo4j.spark.DataSource")
