@@ -25,6 +25,8 @@ object Playground {
         runBasicRead(spark, container)
         runFilteredRead(spark, container)
         runAggregation(spark, container)
+        runSchemaBySampleStrategy(spark, container)
+        runSchemaByStringStrategy(spark, container)
       }
     }
   }
@@ -108,6 +110,42 @@ object Playground {
 
       df.show()
     }
+  }
+
+  private def runSchemaBySampleStrategy(spark: SparkSession, container: Neo4jContainer[_]): Unit = {
+    println("==== Running schema example (sample strategy)")
+
+    val df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("url", container.getBoltUrl)
+      .option("authentication.basic.username", "neo4j")
+      .option("authentication.basic.password", adminPassword)
+      .option("query", "MATCH (n:Person) WITH n LIMIT 2 RETURN id(n) as id, n.name as name")
+      .load()
+
+    df.printSchema()
+    df.show()
+  }
+
+  private def runSchemaByStringStrategy(spark: SparkSession, container: Neo4jContainer[_]): Unit = {
+    println("==== Running schema example (string strategy)")
+
+    val df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("url", container.getBoltUrl)
+      .option("authentication.basic.username", "neo4j")
+      .option("authentication.basic.password", adminPassword)
+      .option("query", "MATCH (n:Person) WITH n LIMIT 2 RETURN id(n) as id, n.name as name")
+      .option("schema.strategy", "string")
+      .load()
+
+    df.printSchema()
+    df.show()
+
+    import scala.jdk.CollectionConverters._
+    val result = df.collectAsList()
+    for (row <- result.asScala) {
+      println(s"""ID is: ${row.getString(0).toLong}, name is: ${row.getString(1)}""")
+    }
+
   }
 
   private def createDriver(container: Neo4jContainer[_]): Driver = {
