@@ -1,5 +1,6 @@
 package io.github.fbiville.spark.playground
 
+import org.apache.spark.sql.types.{DataTypes, StructType, StructField}
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.neo4j.driver.{AuthTokens, Driver, GraphDatabase}
 import org.testcontainers.containers.Neo4jContainer
@@ -25,6 +26,7 @@ object Playground {
         runBasicRead(spark, container)
         runFilteredRead(spark, container)
         runAggregation(spark, container)
+        runSchemaByExplicitStrategy(spark, container)
         runSchemaBySampleStrategy(spark, container)
         runSchemaByStringStrategy(spark, container)
       }
@@ -110,6 +112,21 @@ object Playground {
 
       df.show()
     }
+  }
+
+  private def runSchemaByExplicitStrategy(spark: SparkSession, container: Neo4jContainer[_]): Unit = {
+    println("==== Running schema example (explicit strategy)")
+
+    val df = (spark.read.format("org.neo4j.spark.DataSource")
+      .option("url", container.getBoltUrl)
+      .option("authentication.basic.username", "neo4j")
+      .option("authentication.basic.password", adminPassword)
+      .schema(StructType(Array(StructField("id", DataTypes.StringType), StructField("name", DataTypes.StringType))))
+      .option("query", "MATCH (n:Person) WITH n LIMIT 2 RETURN id(n) as id, n.name as name")
+      .load())
+
+    df.printSchema()
+    df.show()
   }
 
   private def runSchemaBySampleStrategy(spark: SparkSession, container: Neo4jContainer[_]): Unit = {
