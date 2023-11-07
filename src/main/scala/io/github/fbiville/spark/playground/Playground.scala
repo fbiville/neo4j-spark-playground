@@ -1,12 +1,12 @@
 package io.github.fbiville.spark.playground
 
-import org.apache.spark.sql.types.{DataTypes, StructType, StructField}
+import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.neo4j.driver.{AuthTokens, Driver, GraphDatabase}
 import org.testcontainers.containers.Neo4jContainer
 import org.testcontainers.utility.DockerImageName
 
-import scala.util.Using
+import scala.util.{Properties, Using}
 
 object Playground {
 
@@ -21,7 +21,9 @@ object Playground {
           .appName("SparkPlayground")
           .getOrCreate()
 
+        println("=== Versions")
         println(s"Running Spark version ${spark.version}")
+        println(s"Running Scala version ${Properties.versionString}")
         runBasicWrite(spark, container)
         runBasicRead(spark, container)
         runFilteredRead(spark, container)
