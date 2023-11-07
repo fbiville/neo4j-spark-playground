@@ -21,7 +21,7 @@ object Playground {
           .appName("SparkPlayground")
           .getOrCreate()
 
-
+        println(s"Running Spark version ${spark.version}")
         runBasicWrite(spark, container)
         runBasicRead(spark, container)
         runFilteredRead(spark, container)
